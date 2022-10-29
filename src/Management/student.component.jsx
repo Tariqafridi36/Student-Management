@@ -4,6 +4,8 @@ import store from "../Flux/store/student.store";
 import { StudentDetail } from "./student.detail.component";
 import { commonAction } from "../Flux/_actions/common.action";
 import { Form } from "react-bootstrap";
+import { Button } from "@mui/material";
+import { Add } from "@material-ui/icons";
 
 export const ManageStudent = () => {
   const [userId, setUserId] = useState(1);
@@ -25,7 +27,7 @@ export const ManageStudent = () => {
   }
 
   const onRowClick = (row) => {
-    debugger
+    
     commonAction.SetGetStudentNationality({
       method: "GET",
       sid: parseInt(row.ID || 0),
@@ -56,15 +58,15 @@ export const ManageStudent = () => {
           <div className="col-2">
             <div className="float-end">
               {userId === 1 && (
-                <button
-                  className="btn btn-primary"
+                <Button variant="contained" color="primary"
+                   
                   onClick={() => {
                     setAddNew(true);
                     setModalShow(true);
                   }}
                 >
-                  Add Student
-                </button>
+                 <Add /> Add Student
+                </Button>
               )}
             </div>
           </div>
