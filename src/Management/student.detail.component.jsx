@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   Col,
@@ -7,72 +7,73 @@ import {
   InputGroup,
   Modal,
   Row,
-} from "react-bootstrap";
-import { studentAction } from "../Flux/_actions/student.action";
-import { commonAction } from "../Flux/_actions/common.action";
-import commonStore from "../Flux/store/common.store";
-import store from "../Flux/store/student.store";
+} from 'react-bootstrap'
+import { studentAction } from '../Flux/_actions/student.action'
+import { commonAction } from '../Flux/_actions/common.action'
+import commonStore from '../Flux/store/common.store'
+import store from '../Flux/store/student.store'
+import FamilyMember from './family.member.component'
 
 const familyTypes = [
-  { ID: 1, Name: "Parent" },
-  { ID: 2, Name: "Sibling" },
-  { ID: 3, Name: "Spouse" },
-];
+  { ID: 1, Name: 'Parent' },
+  { ID: 2, Name: 'Sibling' },
+  { ID: 3, Name: 'Spouse' },
+]
 
 export const StudentDetail = (props) => {
-  const { show, rowData, close, isNew, user } = props;
+  const { show, rowData, close, isNew, user } = props
 
-  const [isEdit, setIsEdit] = useState(false);
-  const [familyModalShow, setFamilyModalShow] = useState(false);
-  const [isNewS, setIsNewS] = useState(isNew);
-  const [onValidated, setOnValidated] = useState(false);
-  const [onFamilyValidated, setOnFamilyValidated] = useState(false);
-  const [firstName, setFirstName] = useState(rowData.firstName);
-  const [lastName, setLastName] = useState(rowData.lastName);
-  const [dob, setDob] = useState(rowData.dateOfBirth);
-  const [nationality, setNationality] = useState(commonStore.getData());
-  const [familyMembers, setFamilyMembers] = useState([]);
-  const [nationalityId, setNationalityId] = useState(1);
-  const [isFamilyId, setIsFamilyId] = useState(null);
-  const [nationalityTitle, setNationalityTitle] = useState(null);
+  const [isEdit, setIsEdit] = useState(false)
+  const [familyModalShow, setFamilyModalShow] = useState(false)
+  const [isNewS, setIsNewS] = useState(isNew)
+  const [onValidated, setOnValidated] = useState(false)
+  const [onFamilyValidated, setOnFamilyValidated] = useState(false)
+  const [firstName, setFirstName] = useState(rowData.firstName)
+  const [lastName, setLastName] = useState(rowData.lastName)
+  const [dob, setDob] = useState(rowData.dateOfBirth)
+  const [nationality, setNationality] = useState(commonStore.getData())
+  const [familyMembers, setFamilyMembers] = useState([])
+  const [nationalityId, setNationalityId] = useState(1)
+  const [isFamilyId, setIsFamilyId] = useState(null)
+  const [nationalityTitle, setNationalityTitle] = useState(null)
 
-  const [familyFirstName, setFamilyFirstName] = useState("");
-  const [familylastName, setFamilylastName] = useState("");
-  const [familyDob, setFamilyDob] = useState("");
-  const [familyRelatioship, setFamilyRelatioship] = useState("");
+  const [familyFirstName, setFamilyFirstName] = useState('')
+  const [familylastName, setFamilylastName] = useState('')
+  const [familyDob, setFamilyDob] = useState('')
+  const [familyRelatioship, setFamilyRelatioship] = useState('')
 
   useEffect(() => {
-    commonStore.addChangeListener(onChange);
-    store.addChangeListener(onStoreChange);
-    if (commonStore.getData().length === 0) commonAction.GetNationality(null);
+    commonStore.addChangeListener(onChange)
+    store.addChangeListener(onStoreChange)
+    if (commonStore.getData().length === 0) commonAction.GetNationality(null)
 
     setTimeout(() => {
-      const obj = commonStore.getSelectedNationality().nationality;
-      setNationalityTitle(obj?.Title);
-      setNationalityId(obj?.ID);
-    }, 100);
+      const obj = commonStore.getSelectedNationality().nationality
+      setNationalityTitle(obj?.Title)
+      setNationalityId(obj?.ID)
+    }, 100)
 
     return () => {
-      commonStore.removeChangeListener(onChange);
-      store.removeChangeListener(onChange);
-    };
-  }, [nationality, familyMembers, rowData]);
+      commonStore.removeChangeListener(onChange)
+      store.removeChangeListener(onChange)
+    }
+  }, [nationality, familyMembers, rowData])
 
   function onChange() {
-    setNationality(commonStore.getData());
+    setNationality(commonStore.getData())
   }
 
   function onStoreChange() {
-    setFamilyMembers([]);
-    const members = store.getFamilyMembers();
-    setFamilyMembers(members);
+    setFamilyMembers([])
+    const members = store.getFamilyMembers()
+    setFamilyMembers(members)
   }
 
   const onFamilyFormSubmit = (event) => {
-    const form = event.currentTarget;
-    event.preventDefault();
-    event.stopPropagation();
-    setOnFamilyValidated(true);
+    const form = event.currentTarget
+    event.preventDefault()
+    event.stopPropagation()
+    setOnFamilyValidated(true)
     if (form.checkValidity()) {
       if (isFamilyId) {
         studentAction.UpdateDeleteFamilyMember({
@@ -81,8 +82,8 @@ export const StudentDetail = (props) => {
           lastName: familylastName,
           dateOfBirth: familyDob,
           relationship: familyRelatioship,
-          method: "PUT",
-        });
+          method: 'PUT',
+        })
       } else {
         studentAction.addFamilyMember({
           sid: rowData.ID,
@@ -90,49 +91,49 @@ export const StudentDetail = (props) => {
           lastName: familylastName,
           dateOfBirth: familyDob,
           relationship: familyRelatioship,
-        });
+        })
       }
-      
-      setFamilyFirstName("");
-      setFamilylastName("");
-      setFamilyDob("");
-      setFamilyModalShow(false);
+
+      setFamilyFirstName('')
+      setFamilylastName('')
+      setFamilyDob('')
+      setFamilyModalShow(false)
     }
-  };
+  }
 
   const onFormSubmit = (event) => {
-    const form = event.currentTarget;
-    event.preventDefault();
-    event.stopPropagation();
-    setOnValidated(true);
+    const form = event.currentTarget
+    event.preventDefault()
+    event.stopPropagation()
+    setOnValidated(true)
     if (form.checkValidity()) {
       studentAction.AddUpdateStudent({
         ID: isNew ? null : rowData.ID,
         firstName: firstName,
         lastName: lastName,
         dateOfBirth: dob,
-      });
+      })
 
       commonAction.SetGetStudentNationality({
-        method: "PUT",
+        method: 'PUT',
         sid: rowData.ID,
         nid: parseInt(nationalityId || 0),
-      });
+      })
 
-      close(false);
-      studentAction.getStudent();
+      close(false)
+      studentAction.getStudent()
     }
-  };
+  }
 
   const onEdithandler = () => {
-    setIsEdit(true);
-    setIsNewS(true);
-  };
+    setIsEdit(true)
+    setIsNewS(true)
+  }
 
   const handleClose = () => {
-    setFamilyModalShow(false);
-    setOnFamilyValidated(false);
-  };
+    setFamilyModalShow(false)
+    setOnFamilyValidated(false)
+  }
   return (
     <div>
       <Modal
@@ -143,7 +144,7 @@ export const StudentDetail = (props) => {
         <Form noValidate validated={onValidated} onSubmit={onFormSubmit}>
           <Modal.Header closeButton onClick={() => close(false)}>
             <Modal.Title id="contained-modal-title-vcenter">
-              {isNew ? "Add new Student" : "Student Detail"}
+              {isNew ? 'Add new Student' : 'Student Detail'}
             </Modal.Title>
           </Modal.Header>
 
@@ -175,7 +176,7 @@ export const StudentDetail = (props) => {
                   <Col md={2}></Col>
                   <Col xs={12} md={7}>
                     <p>
-                      Date of Birth:{" "}
+                      Date of Birth:{' '}
                       <b>
                         {new Date(rowData.dateOfBirth).toLocaleDateString()}
                       </b>
@@ -297,7 +298,7 @@ export const StudentDetail = (props) => {
                         as="select"
                         aria-describedby="basic-addon2"
                         onChange={(e) => {
-                          setNationalityId(e.target.value);
+                          setNationalityId(e.target.value)
                         }}
                       >
                         {nationality &&
@@ -325,6 +326,7 @@ export const StudentDetail = (props) => {
                     </Button>
                   )}
                 </div>
+                {/* <FamilyMember /> */}
                 <table className="table">
                   <thead>
                     <tr>
@@ -354,16 +356,16 @@ export const StudentDetail = (props) => {
                                   <Button
                                     variant="light"
                                     onClick={() => {
-                                      setFamilyFirstName(item.firstName);
-                                      setFamilylastName(item.lastName);
+                                      setFamilyFirstName(item.firstName)
+                                      setFamilylastName(item.lastName)
                                       setFamilyDob(
                                         new Date(
-                                          item.dateOfBirth
-                                        ).toLocaleDateString()
-                                      );
-                                      setFamilyRelatioship(item.relationship);
-                                      setFamilyModalShow(true);
-                                      setIsFamilyId(item.ID);
+                                          item.dateOfBirth,
+                                        ).toLocaleDateString(),
+                                      )
+                                      setFamilyRelatioship(item.relationship)
+                                      setFamilyModalShow(true)
+                                      setIsFamilyId(item.ID)
                                     }}
                                   >
                                     Edit
@@ -373,20 +375,21 @@ export const StudentDetail = (props) => {
                                     onClick={() => {
                                       studentAction.UpdateDeleteFamilyMember({
                                         ID: item.ID,
-                                        method: "DELETE",
-                                      });
+                                        method: 'DELETE',
+                                      })
 
                                       const filtered = familyMembers.filter(
                                         (x) =>
-                                          x.ID.toString() !== item.ID.toString()
-                                      );
-                                      setFamilyMembers(filtered);
+                                          x.ID.toString() !==
+                                          item.ID.toString(),
+                                      )
+                                      setFamilyMembers(filtered)
                                       setTimeout(() => {
                                         studentAction.GetStudentFamilyMembers(
-                                          rowData.ID
-                                        );
-                                        store.addChangeListener(onStoreChange);
-                                      }, 10);
+                                          rowData.ID,
+                                        )
+                                        store.addChangeListener(onStoreChange)
+                                      }, 10)
                                     }}
                                   >
                                     Delete
@@ -395,7 +398,7 @@ export const StudentDetail = (props) => {
                               )}
                             </td>
                           </tr>
-                        );
+                        )
                       })}
                   </tbody>
                 </table>
@@ -407,7 +410,7 @@ export const StudentDetail = (props) => {
             <Button
               variant="secondary"
               onClick={() => {
-                close(false);
+                close(false)
               }}
             >
               Cancel
@@ -493,7 +496,7 @@ export const StudentDetail = (props) => {
                     as="select"
                     aria-describedby="basic-addon2"
                     onChange={(e) => {
-                      setFamilyRelatioship(e.target.value);
+                      setFamilyRelatioship(e.target.value)
                     }}
                   >
                     {familyTypes &&
@@ -517,7 +520,7 @@ export const StudentDetail = (props) => {
                     <Form.Control as="select">
                       {nationality &&
                         nationality.map((item, index) => {
-                          return <option value={item.ID}>{item.Title}</option>;
+                          return <option value={item.ID}>{item.Title}</option>
                         })}
                     </Form.Control>
                   </Form.Group>
@@ -536,5 +539,5 @@ export const StudentDetail = (props) => {
         </Form>
       </Modal>
     </div>
-  );
-};
+  )
+}

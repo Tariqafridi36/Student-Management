@@ -1,0 +1,11 @@
+.main-pannel {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.main-pannel .pannel-title {
+    padding: 5px 0 20px 0;
+    font-weight: 600;
+    font-size: 20px;
+}
