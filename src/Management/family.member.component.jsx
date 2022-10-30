@@ -1,4 +1,4 @@
-import { Modal } from 'react-bootstrap'
+import { Modal, Row } from 'react-bootstrap'
 import React, { useState } from 'react'
 import { Form, InputGroup } from 'react-bootstrap'
 import { studentAction } from '../Flux/_actions/student.action'
@@ -8,25 +8,24 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import Typography from '@mui/material/Typography'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import './style.css'
-import { useEffect } from 'react'
-import store from '../Flux/store/student.store'
-import { Grid } from '@mui/material'
-import { AddCircle, Close, Edit } from '@material-ui/icons'
+import { useEffect } from 'react' 
+import { Avatar, Grid } from '@mui/material'
+import { AddCircle, Close, Delete, Edit, Save } from '@material-ui/icons'
 import { Stack } from '@mui/system'
 import { Button, IconButton } from '@mui/material'
 import commonStore from '../Flux/store/common.store'
 
 const familyTypes = [
+  { ID: '', Name: '' },
   { ID: 1, Name: 'Parent' },
   { ID: 2, Name: 'Sibling' },
   { ID: 3, Name: 'Spouse' },
 ]
 
-const FamilyMember = ({data}) => {
-  debugger
+const FamilyMember = ({ data }) => {
   const [familyModel, setFamilyModel] = useState({
     list: [],
-    nationalities: [],
+    nationalities: commonStore.getData(),
     id: 0,
     firstname: '',
     lastname: '',
@@ -37,21 +36,30 @@ const FamilyMember = ({data}) => {
     validated: false,
   })
 
+  const getFamilyMemberData = () => {
+    studentAction.GetStudentFamilyMembers(data?.ID, (res) => {
+      setFamilyModel({
+        ...familyModel,
+        list: res.data,
+        isModel: false
+      })
+    })
+  }
+
   useEffect(() => {
-    //commonStore.addChangeListener(onChange)
-    store.addChangeListener(onStoreChange)
-    const members = store.getFamilyMembers()
-    const nation = commonStore.getData()
-    setFamilyModel({ ...familyModel, list: members, nationalities: nation })
-    return () => {
-      //commonStore.removeChangeListener(onChange)
-      // store.removeChangeListener(onStoreChange)
-    }
+    getFamilyMemberData()
   }, [])
 
-  function onStoreChange() {
-    const members = store.getFamilyMembers()
-    setFamilyModel({ ...familyModel, list: members })
+  const onDeleteHandle = (ID) => {
+    studentAction.UpdateDeleteFamilyMember(
+      {
+        method: 'delete',
+        ID: ID,
+      },
+      (res) => {
+        getFamilyMemberData()
+      },
+    )
   }
 
   const onEditHandle = (row) => {
@@ -63,6 +71,7 @@ const FamilyMember = ({data}) => {
       dob: row.dateOfBirth,
       relationship: row.relationship,
       isModel: !familyModel.isModel,
+      expanded: false,
     })
   }
 
@@ -74,8 +83,8 @@ const FamilyMember = ({data}) => {
     const form = event.currentTarget
     event.preventDefault()
     event.stopPropagation()
-    setFamilyModel({ ...familyModel, validated: !familyModel.validated })
-    debugger
+    setFamilyModel({ ...familyModel, validated: true })
+
     if (form.checkValidity()) {
       if (familyModel.id > 0) {
         studentAction.UpdateDeleteFamilyMember({
@@ -85,6 +94,8 @@ const FamilyMember = ({data}) => {
           dateOfBirth: familyModel.dob,
           relationship: familyModel.relationship,
           method: 'PUT',
+        }, (res) =>{
+          getFamilyMemberData()
         })
       } else {
         studentAction.addFamilyMember({
@@ -93,14 +104,108 @@ const FamilyMember = ({data}) => {
           lastName: familyModel.lastname,
           dateOfBirth: familyModel.dob,
           relationship: familyModel.relationship,
+        }, (res) =>{
+          getFamilyMemberData()
         })
       }
 
-      setFamilyModel({
-        ...familyModel,
-        isModel: false,
-      })
+       
     }
+  }
+
+  function stringAvatar(name) {
+    return {
+      children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+    }
+  }
+
+  const AccordianRow = ({ row, index }) => {
+    const [expanded, setExpanded] = useState(false)
+    const fullname = row.firstName + ' ' + row.lastName
+    return (
+      <Accordion
+        onChange={(e, expand) => {
+          setExpanded(expand)
+        }}
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography className="d-flex">
+            {!expanded ? (
+              <>
+                <Avatar {...stringAvatar(fullname)} /> &nbsp;&nbsp;
+                <div className="ml-2">
+                  {fullname}
+                  <p className="small text-muted">{row.relationship}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <Avatar>{index + 1}</Avatar>
+                &nbsp;
+                <div className="mt-2">Family Member # {index + 1}</div>
+              </>
+            )}
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <input
+                  type={'text'}
+                  className="form-control"
+                  value={row.firstName}
+                ></input>
+              </Grid>
+              <Grid item xs={6}>
+                <input
+                  type={'text'}
+                  className="form-control"
+                  value={row.lastName}
+                ></input>
+              </Grid>
+              <Grid item xs={6}>
+                <input
+                  type={'text'}
+                  className="form-control"
+                  value={row.dateOfBirth}
+                ></input>
+              </Grid>
+              <Grid item xs={6}>
+                <input
+                  type={'text'}
+                  className="form-control"
+                  value={row.relationship}
+                ></input>
+              </Grid>
+              <Grid item xs={6}></Grid>
+              <Grid item xs={6}>
+                <Stack direction="row" spacing={2}>
+                  <button
+                    type={'button'}
+                    className="btn btn-danger"
+                    onClick={() => onDeleteHandle(row.ID)}
+                  >
+                    <Delete /> Delete
+                  </button>
+                  <button
+                    type={'button'}
+                    className="btn btn-primary"
+                    onClick={() => onEditHandle(row)}
+                  >
+                    <Edit /> Edit
+                  </button>
+                </Stack>
+              </Grid>
+            </Grid>
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+    )
   }
 
   return (
@@ -111,70 +216,7 @@ const FamilyMember = ({data}) => {
         {familyModel.list.map((row, index) => {
           return (
             <div className="mb-3">
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>Family Member # {index + 1}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <input
-                          type={'text'}
-                          className="form-control"
-                          value={row.firstName}
-                        ></input>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <input
-                          type={'text'}
-                          className="form-control"
-                          value={row.lastName}
-                        ></input>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <input
-                          type={'text'}
-                          className="form-control"
-                          value={row.dateOfBirth}
-                        ></input>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <input
-                          type={'text'}
-                          className="form-control"
-                          value={row.relationship}
-                        ></input>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <input
-                          type={'text'}
-                          className="form-control"
-                          value={row.relationship}
-                        ></input>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Stack direction="row" spacing={2}>
-                          <button type={'button'} className="btn btn-danger">
-                            <Close /> Delete
-                          </button>
-                          <button
-                            type={'button'}
-                            className="btn btn-primary"
-                            onClick={() => onEditHandle(row)}
-                          >
-                            <Edit /> Edit
-                          </button>
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
+              <AccordianRow row={row} index={index} />
             </div>
           )
         })}
@@ -272,6 +314,7 @@ const FamilyMember = ({data}) => {
                 <Form.Label>Member Type</Form.Label>
                 <InputGroup className="mb-3">
                   <Form.Control
+                    required
                     as="select"
                     aria-describedby="basic-addon2"
                     onChange={(e) => {
@@ -291,30 +334,30 @@ const FamilyMember = ({data}) => {
                         </option>
                       ))}
                   </Form.Control>
+
+                  <Form.Control.Feedback
+                    type="invalid"
+                    role="alert"
+                    class="invalid-feedback"
+                  >
+                    Relationship is required!
+                  </Form.Control.Feedback>
                 </InputGroup>
               </div>
             </div>
             <div className="row">
-              <div className="col-6">
-                <Form.Group>
-                  <Form.Label>Nationality</Form.Label>
-                  <Form.Control as="select">
-                    {familyModel.nationalities &&
-                      familyModel.nationalities.map((item, index) => {
-                        return <option value={item.ID}>{item.Title}</option>
-                      })}
-                  </Form.Control>
-                </Form.Group>
-              </div>
+              <div className="col-6"></div>
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={onCloseHandle}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary">
-              Save Changes
-            </Button>
+            <Stack direction="row" spacing={2}>
+              <Button variant="contained" color="error" onClick={onCloseHandle}>
+                <Close /> Cancel
+              </Button>
+              <Button type="submit" color="info" variant="contained">
+                <Save /> Save
+              </Button>
+            </Stack>
           </Modal.Footer>
         </Form>
       </Modal>

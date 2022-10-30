@@ -19,7 +19,7 @@ export const addFamilyMember = (data, onSuccess) => {
   apiMiddleware(paylod);
 };
 
-export const updateDeleteFamilyMember = (data, onSuccess) => {
+export const updateDeleteFamilyMember = (data, onSuccess) => { 
   const payload = {
     url: `familymembers/${data.ID}`,
     data: data,

@@ -23,14 +23,15 @@ class StudentStore extends EventEmitter {
     return _studentData.sort((a, b) => a.ID - b.ID);
   }
 
-  getFamilyMembers() {
-    return _familymemebrs;
+  getFamilyMembers(id) { 
+    return _familymemebrs.sort((a, b) => a.ID - b.ID);
   }
 }
 
 const store = new StudentStore();
 
 dispatcher.register((event) => {
+   
   switch (event.actionType) {
     case StudentConstant.GET:
       _studentData = event.data;

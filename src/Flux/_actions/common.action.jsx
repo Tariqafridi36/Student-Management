@@ -6,31 +6,32 @@ import {
 } from "../../Services/common.service";
 
 export const commonAction = {
-  GetNationality: (req) => {
+  GetNationality: (req, callback) => {
     getNationality(
       req,
       (res) => {
-        dispatcher.dispatch({
-          actionType: CommonConstant.NATIONALITY,
-          data: res.data,
-        });
+        callback(res);
+        // dispatcher.dispatch({
+        //   actionType: CommonConstant.NATIONALITY,
+        //   data: res.data,
+        // });
       },
       null
     );
   },
 
-  SetGetStudentNationality: (req) => {
+  SetGetStudentNationality: (req, callback) => {
     Set_Get_StudentNationality(
       req,
-      (res) => {
-        debugger;
-        dispatcher.dispatch({
-          actionType:
-            req.method === "GET"
-              ? CommonConstant.GETNATIONALITY
-              : CommonConstant.SETNATIONALITY,
-          data: res.data,
-        });
+      (res) => { 
+        callback(res)
+        // dispatcher.dispatch({
+        //   actionType:
+        //     req.method === "GET"
+        //       ? CommonConstant.GETNATIONALITY
+        //       : CommonConstant.SETNATIONALITY,
+        //   data: res.data,
+        // });
       },
       null
     );

@@ -1,43 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { studentAction } from "../Flux/_actions/student.action";
-import store from "../Flux/store/student.store";
-import { StudentDetail } from "./student.detail.component";
-import { commonAction } from "../Flux/_actions/common.action";
-import { Form } from "react-bootstrap";
-import { Button } from "@mui/material";
-import { Add } from "@material-ui/icons";
+import React, { useEffect, useState } from 'react'
+import { studentAction } from '../Flux/_actions/student.action'
+import store from '../Flux/store/student.store'
+import { StudentDetail } from './student.detail.component'
+import { commonAction } from '../Flux/_actions/common.action'
+import { Form } from 'react-bootstrap'
+import { Button } from '@mui/material'
+import { Add } from '@material-ui/icons'
 
 export const ManageStudent = () => {
-  const [userId, setUserId] = useState(1);
-  const [studentData, setStudentData] = React.useState([]);
-  const [selectedRow, setSelectedRow] = useState([]);
-  const [addNew, setAddNew] = useState(false);
-  const [modalShow, setModalShow] = useState(false);
-  useEffect(() => {
-    store.addChangeListener(onChange);
-    if (store.getStudentData().length === 0)
-      studentAction.getStudent(null, null);
-    return () => store.removeChangeListener(onChange);
-  }, [studentData]);
+  const [modelData, setModelData] = useState({
+    studentData: [],
+    add: false,
+    rowData: null,
+    userid: 1,
+  })
 
-  function onChange() {
-    const data = store.getStudentData();
-    setStudentData([]);
-    setStudentData(data);
-  }
+  useEffect(() => {
+    studentAction.getStudent(null, (res) => { 
+      setModelData({ ...modelData, studentData: res.data });
+    })
+  }, []) 
 
   const onRowClick = (row) => {
-    
-    commonAction.SetGetStudentNationality({
-      method: "GET",
-      sid: parseInt(row.ID || 0),
-      nid: 1,
-    });
-    studentAction.GetStudentFamilyMembers(row.ID);
-    setSelectedRow(row);
-    setModalShow(true);
-    setAddNew(false);
-  };
+    // commonAction.GetNationality({})
+    // commonAction.SetGetStudentNationality({
+    //   method: 'GET',
+    //   sid: parseInt(row.ID || 0),
+    //   nid: 1,
+    // })
+    setModelData({ ...modelData, add: true, rowData: row })
+  }
 
   return (
     <React.Fragment>
@@ -47,7 +39,9 @@ export const ManageStudent = () => {
             <Form.Group>
               <Form.Control
                 as="select"
-                onChange={(e) => setUserId(parseInt(e.target.value || 0))}
+                onChange={(e) =>
+                  setModelData({ ...modelData, userid: +e.target.value })
+                }
               >
                 <option value="1">Admin</option>;
                 <option value="2">Registrar</option>;
@@ -57,15 +51,15 @@ export const ManageStudent = () => {
           <div className="col-8"></div>
           <div className="col-2">
             <div className="float-end">
-              {userId === 1 && (
-                <Button variant="contained" color="primary"
-                   
+              {modelData.userid === 1 && (
+                <Button
+                  variant="contained"
+                  color="primary"
                   onClick={() => {
-                    setAddNew(true);
-                    setModalShow(true);
+                    setModelData({ ...modelData, add: true, rowData: null })
                   }}
                 >
-                 <Add /> Add Student
+                  <Add /> Add Student
                 </Button>
               )}
             </div>
@@ -83,14 +77,14 @@ export const ManageStudent = () => {
                 </tr>
               </thead>
               <tbody>
-                {studentData?.length > 0 &&
-                  studentData.map((row, index) => {
+                {modelData.studentData?.length > 0 &&
+                  modelData.studentData.map((row, index) => {
                     return (
                       <React.Fragment>
                         <tr
-                          key={index}
+                          key={row.ID.toString()}
                           onClick={() => {
-                            if (userId === 2) onRowClick(row);
+                            if (modelData.userid === 2) onRowClick(row)
                           }}
                         >
                           <td>{row.ID}</td>
@@ -101,7 +95,7 @@ export const ManageStudent = () => {
                           </td>
                         </tr>
                       </React.Fragment>
-                    );
+                    )
                   })}
               </tbody>
             </table>
@@ -109,15 +103,9 @@ export const ManageStudent = () => {
         </div>
       </div>
 
-      {modalShow && (
-        <StudentDetail
-          user={userId}
-          isNew={addNew}
-          show={modalShow}
-          rowData={selectedRow}
-          close={() => setModalShow(false)}
-        />
+      {modelData.add && (
+        <StudentDetail modelData={modelData} setModelData={setModelData} />
       )}
     </React.Fragment>
-  );
-};
+  )
+}

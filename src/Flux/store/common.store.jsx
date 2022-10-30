@@ -37,8 +37,7 @@ dispatcher.register((event) => {
       _data = event.data;
       commonStore.emitChange();
       break;
-    case CommonConstant.GETNATIONALITY:
-      debugger;
+    case CommonConstant.GETNATIONALITY: 
       selectedNationality = event.data;
       commonStore.emitChange();
       break;

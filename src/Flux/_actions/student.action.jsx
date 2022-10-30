@@ -1,86 +1,91 @@
 import {
   getStudentData,
   addUpdateStudent,
-} from "../../Services/student.service";
-import { dispatcher } from "../../Helper/middleware/appDispatcher";
-import { StudentConstant } from "../../Helper/constants/student.constanct";
+} from '../../Services/student.service'
+import { dispatcher } from '../../Helper/middleware/appDispatcher'
+import { StudentConstant } from '../../Helper/constants/student.constanct'
 import {
   addFamilyMember,
   getStudentFamilyMembers,
   updateDeleteFamilyMember,
   updateFamilyMemberNationality,
-} from "../../Services/familymember.service";
+} from '../../Services/familymember.service'
 
 export const studentAction = {
-  getStudent: (req) => {
+  getStudent: (req, callback) => {
     getStudentData(
       req,
       (res) => {
-        dispatcher.dispatch({
-          actionType: StudentConstant.GET,
-          data: res.data,
-        });
+        callback(res)
+        // dispatcher.dispatch({
+        //   actionType: StudentConstant.GET,
+        //   data: res.data,
+        // })
       },
-      null
-    );
+      null,
+    )
   },
 
-  AddUpdateStudent: (req) => {
+  AddUpdateStudent: (req, callback) => {
     addUpdateStudent(
       req,
       (res) => {
-        dispatcher.dispatch({
-          actionType: req.ID > 0 ? StudentConstant.UPDATE : StudentConstant.ADD,
-          data: res.data,
-        });
+        // dispatcher.dispatch({
+        //   actionType: req.ID > 0 ? StudentConstant.UPDATE : StudentConstant.ADD,
+        //   data: res.data,
+        // })
+        callback(res)
       },
-      null
-    );
+      null,
+    )
   },
 
-  GetStudentFamilyMembers: (id) => {
+  GetStudentFamilyMembers: (id, callback) => {
     getStudentFamilyMembers(
       id,
       (res) => {
-        dispatcher.dispatch({
-          actionType: StudentConstant.GETFAMILYMEMBERS,
-          data: res.data,
-        });
+        // dispatcher.dispatch({
+        //   actionType: StudentConstant.GETFAMILYMEMBERS,
+        //   data: res.data,
+        // }) 
+        callback(res)
       },
-      null
-    );
+      null,
+    )
   },
 
-  addFamilyMember: (req) => {
+  addFamilyMember: (req, callback) => {
     addFamilyMember(
       req,
       (res) => {
-        dispatcher.dispatch({
-          actionType: StudentConstant.ADDFAMILYMEMBER,
-          data: res.data,
-        });
+        // dispatcher.dispatch({
+        //   actionType: StudentConstant.ADDFAMILYMEMBER,
+        //   data: res.data,
+        // })
+        callback(res)
       },
-      null
-    );
+      null,
+    )
   },
 
-  UpdateDeleteFamilyMember: (req) => {
+  UpdateDeleteFamilyMember: (req, callback) => {
     updateDeleteFamilyMember(req, (res) => {
-      dispatcher.dispatch({
-        actionType:
-          req.method === "PUT"
-            ? StudentConstant.UPDATEFAMILYMEMBER
-            : StudentConstant.DELETEFAMILYMEMBER,
-        data: res.data,
-      });
-    });
+      // dispatcher.dispatch({
+      //   actionType:
+      //     req.method === 'PUT'
+      //       ? StudentConstant.UPDATEFAMILYMEMBER
+      //       : StudentConstant.DELETEFAMILYMEMBER,
+      //   data: res.data,
+      // })
+      callback(res)
+    })
   },
   UpdateFamilyMemberNationality: (req) => {
     updateFamilyMemberNationality(req, (res) => {
       dispatcher.dispatch({
         actionType: StudentConstant.UPDATEFAMILYMEMBERNATIONALITY,
         data: res.data,
-      });
-    });
+      })
+    })
   },
-};
+}
